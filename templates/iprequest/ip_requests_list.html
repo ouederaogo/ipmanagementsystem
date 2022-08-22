@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Ip request list -->
+    <section class="mb-4">
+      <div class="container">
+        <!-- Ip request list  -->
+        <div>
+          <h3>Request List</h3>
+        </div>
+        <div class="card mb-3">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item fw-bold">IP Request Statistics</li>
+            <li class="list-group-item">
+              <div class="pb-3">
+                <canvas width="200" height="40"  id="ipRequestStats"></canvas>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="row">
+          <aside class="col-lg-2 mb-3">
+            <ul class="list-group">
+              <a class="list-group-item {% if request_status == 'all' %} active {% endif %}" href="{% url 'ip_requests_list' %}"> All Requests </a>
+              <a class="list-group-item {% if request_status == 'valid' %} active {% endif %}" href="{% url 'ip_requests_list' %}?request_status=valid"> Valid Requests <span class="badge bg-success rounded-pill">{{ request_valid_count }}</span></a
+                ></a>
+              <a class="list-group-item {% if request_status == 'expired' %} active {% endif %}" href="{% url 'ip_requests_list' %}?request_status=expired"> Expired Requests <span class="badge bg-danger rounded-pill">{{ request_expired_count }}</span></a
+                ></a>
+            </ul>
+          </aside>
+          <aside class="col-lg-10">
+            <div class="card mb-3">
+              <table class="table">
+                <thead class="text-muted">
+                  <tr class="small text-uppercase">
+                    <th scope="col">Req. ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Assigned IP</th>
+                    <th scope="col">Time Left</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for approved_request in approved_request_list %}
+                  <tr>
+                    
+                    <td scope="row">
+                      <!-- Need to make href and ID unique -->
+                      <a
+                      class="fw-bolder"
+                        data-bs-toggle="offcanvas"
+                        href="#id{{ approved_request.request_id }}"
+                        role="button"
+                        aria-controls="id{{ approved_request.request_id }}"
+                      >
+                      #{{ approved_request.request_id }}
+                        
+                      </a>
+
+                      <div
+                        class="offcanvas offcanvas-end"
+                        tabindex="-1"
+                        id="id{{ approved_request.request_id }}"
+                        aria-labelledby="id{{ approved_request.request_id }}Label"
+                      >
+                        <div class="offcanvas-header">
+                          <h5
+                            class="offcanvas-title"
+                            id="id{{ approved_request.request_id }}Label"
+                          >
+                            {{ approved_request.stuff_user.first_name |lower |capfirst }} {{ approved_request.stuff_user.last_name |lower |capfirst }}
+                          </h5>
+                          <button
+                            type="button"
+                            class="btn-close text-reset"
+                            data-bs-dismiss="offcanvas"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="offcanvas-body">
+                          <div class="card mb-3">
+
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item">
+                                  <small class="d-block fs-6">
+                                    <span style="color: #5b6987"
+                                      ><i class="bi bi-upc-scan"></i></span>
+
+                                    Req. ID:
+                                    <span class="fw-bolder" style="color: #0d6efd"
+                                      >#{{ approved_request.request_id }}</span
+                                    >
+                                  </small>  
+                              </li>                              
+
+                              <li class="list-group-item">
+                                
+                                
+                                {% if approved_request.request_status == 'accepted' %}
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-toggles2"></i
+                                  ></span>
+
+                                  Status:
+                                  <!-- When status = Expired, color=#dc3545 -->
+                                  <span class="fw-bolder text-success" >Valid</span
+                                  >
+                                </small>
+                                {% elif approved_request.request_status == 'expired' %}
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-toggles2"></i
+                                  ></span>
+
+                                  Status:
+                                  <!-- When status = Expired, color=#dc3545 -->
+                                  <span class="fw-bolder text-danger" >Expired</span
+                                  >
+                                </small>
+                                {% endif %}
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-ladder"></i></span>
+
+                                  Extended:
+                                  <span class="text-danger">{{ approved_request.extend }}</span
+                                  >
+                                </small> 
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-ethernet"></i
+                                  ></span>
+
+                                  IP Assigned:
+                                  {% for ip in  approved_request.assigned_ip.all %}
+                                  <div class="fw-bolder px-5" style="color: #0d6efd"
+                                    >{{ ip.ip_address }}</div
+                                  >
+                                  {% endfor %}
+                                </small>
+                              </li>
+                              <li class="list-group-item">
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-envelope-fill"></i
+                                  ></span>
+
+                                  Email:
+                                  <span style="color: #5b6987"
+                                    >{{ approved_request.email }}</span
+                                  >
+                                </small>
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-align-start"></i
+                                  ></span>
+
+                                  Requested At:
+                                  <span style="color: #5b6987">{{ approved_request.request_date | date:"M d, Y | H:i" }}</span>
+                                </small>
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-align-end"></i
+                                  ></span>
+
+                                  Expired At:
+                                  <span style="color: #5b6987">{{ approved_request.lease_end | date:"M d, Y" }} | 00:00</span>
+                                </small>
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-globe2"></i></span>
+
+                                  Requestor IP:
+                                  <span style="color: #5b6987">{{ approved_request.requestor_ip }} </span>
+                                </small>
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-layers"></i></span>
+
+                                  Time Left:
+                                  <span class="text-danger">{{ approved_request.lease_end | timeuntil }}</span>
+                                </small>
+                              </li>
+                              <li class="list-group-item">
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-person-fill"></i
+                                  ></span>
+
+                                  Approved By:
+                                  <span style="color: #5b6987">{{ approved_request.approved_by.first_name |lower | capfirst }} {{ approved_request.approved_by.last_name |lower | capfirst }}</span>
+                                </small>
+
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-clock-fill"></i
+                                  ></span>
+
+                                  Approved At:
+                                  <span style="color: #5b6987">{{ approved_request.approved_date | date:"M d, Y | H:i"  }}</span>
+                                </small>
+                              </li>
+                              <li class="list-group-item">
+                                <small class="d-block fs-6">
+                                  <span style="color: #5b6987"
+                                    ><i class="bi bi-chat-right-text-fill"></i
+                                  ></span>
+
+                                  Comments:
+                                  <span style="color: #5b6987"
+                                    >{{ approved_request.comment }}</span
+                                  >
+                                </small>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td >
+                      {{ approved_request.stuff_user.first_name |lower |capfirst }} {{ approved_request.stuff_user.last_name |lower |capfirst }}
+                    </td>
+                    <td>{{ approved_request.stuff_user.email }}</td>
+                    <td>
+                      {% for ip in approved_request.assigned_ip.all  %}
+                      <div>
+                        <span type="button" class="position-relative px-2">
+                          {{ ip.ip_address }}
+                          <span
+                            class="position-absolute top-50 start-0 translate-middle p-1 bg-{{ approved_request.status_color }} border border-light rounded-circle"
+                          >
+                            <span class="visually-hidden">New alerts</span>
+                          </span>
+                        </span>
+                      </div>
+                      {% endfor %}
+                    </td>
+                    <td>{{ approved_request.lease_end | timeuntil  }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Logic -->
+        <div class="text-center pt-4"> 
+          <!-- step#1 -->
+          {% if approved_request_list.has_previous %}
+              <a class="btn btn-outline-primary mb-4" href="?page=1">First</a>
+              <a class="btn btn-outline-primary mb-4" href="?page={{approved_request_list.previous_page_number}}">Previous</a>
+          {% endif %}
+          <!-- step#2 -->
+          {% for num in approved_request_list.paginator.page_range %}
+              {% if approved_request_list.number == num %}
+                  <a class="btn btn-primary mb-4" href="?page={{num}}">{{ num }}</a>
+              {% elif num > approved_request_list.number|add:'-3' and num < approved_request_list.number|add:'3'  %}
+                  <a class="btn btn-outline-primary mb-4" href="?page={{num}}">{{ num }}</a>
+              {% endif %}
+
+          {% endfor %}
+          <!-- step#3 -->
+          {% if approved_request_list.has_next %}
+              <a class="btn btn-outline-primary mb-4" href="?page={{ approved_request_list.next_page_number }}">Next</a>
+              <a class="btn btn-outline-primary mb-4" href="?page={{ approved_request_list.paginator.num_pages }}">Last</a>            
+          {% endif %}
+        </div> 
+        <!-- End of Pagination Logic -->
+
+
+          </aside>
+        </div>
+      </div>
+    </section>
+
+        <!-- IP Request Stats graph -->
+    <script>
+    const fresh_data = '{{requests_stats_per_month}}'.split(',').slice(0,-1)
+    const data = fresh_data.map(function(item) {
+        return parseInt(item, 10);
+        });
+     
+
+      const ctx_ip_request = document.getElementById("ipRequestStats");
+      const ipRequestChart = new Chart(ctx_ip_request, {
+        type: "line",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: [
+            {
+              label: "IP Req. Number per month",
+              data: data,
+              backgroundColor: [
+                "rgb(25, 135, 84)",
+                "rgb(220, 53, 69)",
+                "rgb(108, 117, 125)",
+              ],
+              hoverOffset: 5,
+              spacing: 0,
+              cutout: "60%",
+              // weight: 4,
+            },
+          ],
+        },
+        options: {
+        scales: {
+            y: {
+                stacked: true
+            },
+            x: {
+                beginAtZero: true
+           }
+        }
+    }
+
+      
+
+        // options: {
+        //   scales: {
+        //     y: {
+        //       beginAtZero: true,
+        //     },
+        //   },
+        // },
+      });
+    </script>
+
+
+
+
+{% endblock %}

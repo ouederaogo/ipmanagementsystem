@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+<!--Check your IP Lease Status  -->
+    <section>
+      <div class="container mb-5">
+        <h3>Check my IP Lease Records</h3>
+      
+        <div class="border-bottom mb-2 pb-1">
+          <small class="mr-md-auto"><strong>{{ my_ip_records.count }}</strong> Records found for you <span style="color: #0d6efd;">{{ request.user.first_name | lower | capfirst }}</span>.</small>
+        </div>
+             
+        <div class="card mb-3">
+          <table class="table">
+            <thead class="text-muted">
+              <tr class="small text-uppercase">
+                <th scope="col">REQ. ID</th>
+                <th scope="col">ip</th>
+                <th scope="col">Status</th>
+                <th scope="col">Request Date</th>
+                <th scope="col">Expired Date</th>
+                <th scope="col">Days Left</th>
+                <th scope="col">Extend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for req_record in my_ip_records %}
+              <tr>
+                <th scope="row">{{ req_record.request_id  }}</th>
+                <td>
+                {% if req_record.assigned_ip.all %}
+                  {% for ip in  req_record.assigned_ip.all %}
+                  <div>
+                    <span class="position-relative px-2">
+                      {{ ip.ip_address }}
+                      <span
+                        class="position-absolute top-50 start-0 translate-middle p-1 bg-{{ req_record.status_color }} border border-light rounded-circle"
+                      >
+                        <span class="visually-hidden">New alerts</span>
+                      </span>
+                    </span>
+                  </div>
+                  {% endfor %}
+                  {% elif req_record.request_status == "rejected"  %}
+                  <span style="color: #dc3545;">No IP Assigned</span> 
+                  {% else %}
+                  <span class="text-primary">Waiting for approval</span>                 
+                  {% endif %}
+                </td>
+                <td>
+                  {% if req_record.request_status == 'accepted' %}
+                  <span style="color: #198754;">IP Assigned</span>
+                  {% elif  req_record.request_status == 'rejected' %}
+                  <span style="color: #dc3545;">Was rejected</span>
+                  {% elif  req_record.request_status == 'new' %}
+                  <span style="color: #0d6efd">Not Yet Approved</span>
+                  {% elif  req_record.request_status == 'expired' %}
+                  <span style="color: #6c757d">Expired</span>
+                  {% endif %}
+                  
+                </td>
+                <td>{{ req_record.request_date | date:"M d, Y | H:i" }}</td>
+                <td>{{ req_record.lease_end_midnight | date:"M d, Y | H:i" }} </td>
+                
+
+                {% if  req_record.request_status == 'rejected' or req_record.request_status == 'expired' %}
+                <td>0 minutes</td>
+                {% else %}
+                <td>{{ req_record.lease_end_midnight | timeuntil }}</td>
+                {% endif %}
+
+                <!-- extend btn -->
+                {% if  req_record.request_status == 'accepted' %}
+                  {% if  req_record.extend < 4 %}
+
+                  <td>
+                    <a href="{% url 'my_ip_lease_records' %}?request_id={{ req_record.request_id }}" class="btn btn-sm btn-primary">
+                      Extended <span class="badge bg-success"> {{ req_record.extend }} </span>
+                    </a>
+                  </td>
+                  {% else %}
+                  <td>
+                    <a href="" type="button" class="btn btn-sm btn-primary disabled" disabled>
+                      Max. Reached <span class="badge bg-danger"> {{ req_record.extend }} </span>
+                    </a>
+                  </td>
+
+                  {% endif %}
+                {% else %}
+                <td>
+                  <button  type="button" class="btn btn-sm btn-primary disabled" disabled>
+                     Ext. Disabled  <span class="badge bg-secondary"> {{ req_record.extend }} </span>
+                  </button>
+                </td>
+                
+                {% endif %}
+                
+              </tr>
+              {% endfor %}              
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Logic -->
+        <div class="text-center pt-4"> 
+          <!-- step#1 -->
+          {% if my_ip_records.has_previous %}
+              <a class="btn btn-outline-primary mb-4" href="?page=1">First</a>
+              <a class="btn btn-outline-primary mb-4" href="?page={{my_ip_records.previous_page_number}}">Previous</a>
+          {% endif %}
+          <!-- step#2 -->
+          {% for num in my_ip_records.paginator.page_range %}
+              {% if my_ip_records.number == num %}
+                  <a class="btn btn-primary mb-4" href="?page={{num}}">{{ num }}</a>
+              {% elif num > my_ip_records.number|add:'-3' and num < my_ip_records.number|add:'3'  %}
+                  <a class="btn btn-outline-primary mb-4" href="?page={{num}}">{{ num }}</a>
+              {% endif %}
+
+          {% endfor %}
+          <!-- step#3 -->
+          {% if my_ip_records.has_next %}
+              <a class="btn btn-outline-primary mb-4" href="?page={{ my_ip_records.next_page_number }}">Next</a>
+              <a class="btn btn-outline-primary mb-4" href="?page={{ my_ip_records.paginator.num_pages }}">Last</a>            
+          {% endif %}
+        </div> 
+        <!-- End of Pagination Logic -->
+
+      </div>
+    </section>
+ 
+
+{% endblock %}

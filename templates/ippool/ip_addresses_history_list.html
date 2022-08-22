@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+ 
+
+   <!-- IP report records -->
+    <section>
+      <div class="container mb-5">
+
+        <h3>IPs Lease History Tracking</h3>
+
+        <div class="mb-3">
+            <form action="" class="d-flex" method="POST">
+                {% csrf_token %}
+              <input name="ip_address"
+                class="form-control me-2"
+                type="search"
+                placeholder="Enter a specific  ip address ..."
+                aria-label="Search"
+                required
+              />
+              <button class="btn btn-outline-primary" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+          </div>
+      
+      <div class="border-bottom mb-2 pb-1">
+        <small class="mr-md-auto"><strong>{{ ip_address_pool | length  }}</strong> Records found.</small>
+      </div>
+
+      <!-- IP History tracking -->
+      <div class="row">
+
+        {% for ip in ip_address_pool %}
+        {% if ip.lease_count > 0 %}
+        <div class="col-lg-3 mb-3">
+          <div class="card " style="border-left: 0.5rem solid #0d6efd ;">
+            <div class="px-2 py-2 d-flex justify-content-between">
+              <div class="fw-bold py-1 text-primary">{{ip.ip_address}}
+                <span class="badge bg-primary rounded-pill mx-1">{{ip.lease_count}}</span>
+              </div>
+              <div class="fw-bold">
+                <div class="dropdown dropstart">
+                  <a class="btn  text-primary" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li class="d-grid"><a class="dropdown-item d-grid" href="{% url 'ip_addresses_history' %}?ip_slug={{ ip.slug }}"><span class="btn btn-sm btn-primary">View Detail <i class="bi bi-eye-fill"></i></a></span></li>
+                  </ul>
+                </div>
+    
+              </div>
+            </div>
+            <hr class="my-0">
+            <div class="my-0 mx-0 p-1">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item py-0 m-0">
+                  <small>Lastly used by: <span class="fw-bold">{{ip.latest_request.stuff_user.first_name}}</span></small>
+                </li>
+                <li class="list-group-item py-0 m-0">
+                  <small>Current Status: <span class="fw-bold">{{ip.latest_request.get_request_status}}</span></small>
+                </li>
+              </ul>
+            </div> 
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+      </div>
+        
+      </div>
+    </section>
+
+{% endblock %}

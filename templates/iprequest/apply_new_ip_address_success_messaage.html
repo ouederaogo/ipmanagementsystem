@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- successfull message confirmation -->
+    <section>
+      <div class="container">
+        <div  class="text-center mb-5">
+          <div class="fs-3" style="color:#198754;"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="font__noto fs-3">Thanks {{ new_request.first_name | capfirst }} for your application</div>
+          <small>Your IP address application has been successfully received and will be processed soon! If ok, you will be sent an ip address to your email !</small>
+        </div>
+        <div >
+          <div class="text-center mb-3">
+            <h3>Your application Details Below</h3>
+          </div>
+          <article class="card mx-auto " style="max-width: 520px;">
+            <div class="card-body" >
+              <div>Req. ID: <span class="fw-bolder text-primary">#{{ new_request.request_id | lower }}</span></div>
+              <div>Name: <strong>{{ new_request.stuff_user.first_name | lower | capfirst }} {{ new_request.stuff_user.last_name |  lower | capfirst  }}</strong></div>
+              <div>Number of IP Requested: <strong>{{ new_request.number_of_ip | lower }}</strong></div>
+              <div>Requested At : <strong>{{ new_request.request_date }}</strong></div>
+              <div>Lease end: <strong>{{ new_request.lease_end }}</strong></div>
+              {% if new_request.comment %}
+              <div>Comments: <strong>{{ new_request.comment }} </strong> </div>
+              {% else %}
+              <div>Comments: <strong> No comment </strong> </div>
+              {% endif %}
+            
+            </div>
+          </article>
+        </div>
+      </div>
+
+    </section>
+
+{% endblock %}

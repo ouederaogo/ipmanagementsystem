@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- IP request successfull approval page -->
+    <section>
+      <div class="container">
+        <div  class="text-center mb-3">
+          <div class="fs-3" style="color:#198754;"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="font__noto fs-3">Successfull Approved Request <span style="color:#0d6efd">#{{ new_request.request_id }}</span></div>
+          <small>The IP address <span class="fw-bolder" style="color:#0d6efd">{{ allocate_ip.ip_address }}</span> has been successfull sent to email <span style="color:#0d6efd">{{ new_request.stuff_user.email | lower  }}</span>!</small>
+        </div>
+        <div class="text-center mb-3">
+          <h3>Approval Details Below</h3>
+        </div>
+        <div class="card mx-auto mb-4" style="max-width: 520px;">          
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Name: <span class="fw-bolder">{{ new_request.stuff_user.first_name | lower | capfirst }} {{ new_request.stuff_user.last_name | lower | capfirst }}</span></li>
+            <li class="list-group-item">Email: <span class="fw-bolder">{{ new_request.stuff_user.email | lower  }}</span></li>
+            <li class="list-group-item">
+              <span class="d-block">Lease Start: <span class="fw-bolder">{{ new_request.lease_start }}</span></span>
+              <span class="d-block">Lease End: <span class="fw-bolder">{{ new_request.lease_end }}</span></span>
+            </li>
+            <li class="list-group-item">
+              <span class="d-block">Approved By: <span class="fw-bolder" style="color:#0d6efd">{{ new_request.approved_by.first_name }}</span></span>
+              <span class="d-block">Approved Date: <span class="fw-bolder">{{ new_request.approved_date }}</span></span>
+            </li>
+
+            <li class="list-group-item">
+              <span class="d-block">Allocated IP:</span></span>
+              {% for selected_ip in selected_ip_list %}
+              <span class="d-block"><span class="fw-bolder" style="color:#0d6efd">{{ selected_ip.ip_address }}</span></span>
+              {% endfor %}
+              
+            </li>
+            {% if new_request.comment %}
+            <li class="list-group-item">Message: <span class="text-muted"> {{ new_request.comment }} </span></li>
+            {% else %}
+            <li class="list-group-item">Message: <span class="text-muted"> Not Available </span></li>
+            {% endif %}
+          </ul>
+          
+        </div>
+        <div class="text-center mb-4">
+            {% if new_requests_processors %}
+            <a href="{% url 'pending_ip_requests' %}" class="btn btn-primary">Process Remaining Requests <span class="badge bg-danger">+{{ new_requests_processors.count }}</span></a>
+            {% endif %}
+            <a href="{% url 'ip_requests_list' %}" class="btn btn-outline-info">View Approved Requests List </a>
+        </div>
+      </div>
+
+    </section>
+ 
+{% endblock %}

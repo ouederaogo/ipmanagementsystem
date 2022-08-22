@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- IP List Status SECTION -->
+    <section>
+      <div class="container mb-3">
+        <div class="mb-4">
+          <h3>IP Address Pool  Status</h3>          
+        </div>
+        {% if  unassigned_ip_nums == 0 and assigned_ip_nums == 0 and reserved_ip_nums == 0 %}
+        <div class="mb-3 fw-bold" style="color: #dc3545;">
+          <small><i class="bi bi-exclamation-triangle-fill"></i> IP address pool is empty, please refill the address pool!</small>
+        </div>
+        {% elif unassigned_ip_nums == 0 %}
+        <div class="mb-3 fw-bold" style="color: #dc3545;">
+          <small><i class="bi bi-exclamation-triangle-fill"></i> IP address pool is exhausted, no more available IP address to lease!</small>
+        </div>     
+
+        {% endif %}
+        
+        <div class="row">          
+          <aside class="col-lg-2">
+            <ul class="list-group mb-3">
+              <a class="list-group-item {% if ip_status == 'all' %} active {% endif %}" href="{% url 'ip_address_pool' %}"> All IPs </a>
+              <a class="list-group-item {% if ip_status == 'unassigned' %} active {% endif %}" href="{% url 'ip_address_pool' %}?ip_status=unassigned">
+                Unassigned
+                <span class="badge bg-success rounded-pill">{{unassigned_ip_nums}}</span></a
+              >
+              <a class="list-group-item {% if ip_status == 'assigned' %} active {% endif %}" href="{% url 'ip_address_pool' %}?ip_status=assigned">
+                Assigned IPs
+                <span class="badge bg-danger rounded-pill">{{ assigned_ip_nums }}</span></a
+              >
+              <a class="list-group-item {% if ip_status == 'reserved' %} active {% endif %}" href="{% url 'ip_address_pool' %}?ip_status=reserved">
+                Reserved IPs
+                <span class="badge bg-secondary rounded-pill">{{ reserved_ip_nums }}</span></a
+              >
+            </ul>
+            <div>
+              <div>                
+
+                  <a   class="btn btn-outline-primary mb-3 text-center d-grid"  data-bs-toggle="modal" data-bs-target="#generateIPReport">
+                  <span class="d-block fs-5">
+                    <i class="bi bi-file-earmark-zip-fill"></i>
+                  </span>Generate IP Report 
+                </a>
+
+                <!-- Modal -->
+                <div class="modal fade" id="generateIPReport" tabindex="-1" aria-labelledby="generateIPReportLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="generateIPReportLabel">Confirm report generation  </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <span ><span class="text-primary"><i class="bi bi-info-circle-fill"></i></span> The report generation will take few times, do you want to continue?</span>
+                      </div>
+                      <div class="modal-footer ">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{% url 'generate_ip_report' %}" class="btn btn-primary">Confirm Generate</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- modula end -->
+
+
+              </div>
+
+              <div>
+                <a href="{% url 'ip_report_list' %}" class="btn btn-info mb-3 text-center d-grid" >
+                  <span class="d-block fs-5">
+                    <i class="bi bi-eye-fill"></i>
+                  </span>View IP Reports</a>
+              </div>
+
+              <div>
+                 <a   class="btn btn-danger mb-3 text-center d-grid" data-bs-toggle="modal" data-bs-target="#deleteIPPool">
+                  <span class="d-block fs-5">
+                    <i class="bi bi-trash3-fill"></i>
+                  </span>Delete ALL IPs 
+                </a>
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteIPPool" tabindex="-1" aria-labelledby="deleteIPPoolLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="deleteIPPoolLabel">Confirm delete all IPs  </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <span ><span class="text-danger"><i class="bi bi-exclamation-octagon-fill"></i></span> Be awared  this will remove all IPs from address pool. Are you to delete ?</span>
+                      </div>
+                      <div class="modal-footer ">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{% url 'delete_all_ip_from_pool' %}" class="btn btn-danger">Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- modula end -->
+              </div>
+            </div>            
+          </aside>
+          <aside class="col-lg-6">
+            <!-- IP list -->
+            <div class="card mb-3">
+              <table class="table">
+                <thead class="text-muted">
+                  <tr class="small text-uppercase">
+                    <th scope="col">#</th>
+                    <th scope="col">IP address</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ip in ip_address_pool %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td class="ip_address">{{ ip.ip_address }}</td>
+                    <td>
+                      <div>
+                        <span class="position-relative px-2 text-muted">
+                          {{ ip.ip_status | capfirst }}
+                          <span
+                            class="position-absolute top-50 start-0 translate-middle p-1 bg-{{ ip.status_color }} border border-light rounded-circle"
+                          >
+                            <span class="visually-hidden">New alerts</span>
+                          </span>
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'update_ip_address' ip.slug %}"
+                          ><i class="bi bi-pencil-square"></i
+                        ></a>                        
+                        <!-- modula start -->
+                        <!-- Button trigger modal -->
+                        <a   class="btn btn-sm btn-outline-danger mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal{{ ip.id }}">
+                          <i class="bi bi-trash3"></i
+                        >
+                        </a>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal{{ ip.id }}" tabindex="-1" aria-labelledby="exampleModal{{ ip.id }}Label" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModal{{ ip.id }}Label">Confirm delete IP {{ ip.ip_address }} </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <span ><span class="text-warning"><i class="bi bi-exclamation-circle-fill"></i></span> Are you sure you want to delete IP {{ ip.ip_address }}?</span>
+                              </div>
+                              <div class="modal-footer ">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <a href="{% url 'delete_ip_address' ip.slug %}" class="btn btn-danger ">Delete</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- modula end -->
+
+                      </div>
+                    </td>
+                  </tr>                  
+                  {% endfor  %}
+
+                  
+                </tbody>
+              </table>
+            </div>
+            <!-- Pagination Logic -->
+            <div class="text-center pt-4"> 
+              <!-- step#1 -->
+              {% if ip_address_pool.has_previous %}
+                  <a class="btn btn-outline-primary mb-4" href="?page=1">First</a>
+                  <a class="btn btn-outline-primary mb-4" href="?page={{ip_address_pool.previous_page_number}}">Previous</a>
+              {% endif %}
+              <!-- step#2 -->
+              {% for num in ip_address_pool.paginator.page_range %}
+                  {% if ip_address_pool.number == num %}
+                      <a class="btn btn-primary mb-4" href="?page={{num}}">{{ num }}</a>
+                  {% elif num > ip_address_pool.number|add:'-3' and num < ip_address_pool.number|add:'3'  %}
+                      <a class="btn btn-outline-primary mb-4" href="?page={{num}}">{{ num }}</a>
+                  {% endif %}
+
+              {% endfor %}
+              <!-- step#3 -->
+              {% if ip_address_pool.has_next %}
+                  <a class="btn btn-outline-primary mb-4" href="?page={{ ip_address_pool.next_page_number }}">Next</a>
+                  <a class="btn btn-outline-primary mb-4" href="?page={{ ip_address_pool.paginator.num_pages }}">Last</a>            
+              {% endif %}
+            </div> 
+            <!-- End of Pagination Logic -->
+          </aside>
+          <aside class="col-lg-4">
+            <div class="card mb-3">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item fw-bold">
+                  Current IPs Pool Statistics
+                </li>
+                <li class="list-group-item">
+                  <div class="pb-3">
+                    <canvas id="ipPoolStats" width="200" height="200"></canvas>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+    <section>
+      <!-- Floating btn -->
+      <div id="foat__btn__container" class="hidden">
+        <a href="{% url 'add_ip_address' %}" id="float__btn" class="float p-0 "> Add  IP &nbsp; 
+          <i class="bi bi-plus-circle"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- IP Pool stats graph -->
+    <script>
+      const ctx_ip_pool = document.getElementById("ipPoolStats");
+      const ipPoolChart = new Chart(ctx_ip_pool, {
+        type: "doughnut",
+        data: {
+          labels: ["Unassigned", "Assigned", "Reserved"],
+          datasets: [
+            {
+              label: "IP Pool Stats",
+              data: [ parseInt ('{{ unassigned_ip_nums }}') , parseInt ('{{ assigned_ip_nums }}'), parseInt ('{{ reserved_ip_nums }}')],
+              backgroundColor: [
+                "rgb(25, 135, 84)",
+                "rgb(220, 53, 69)",
+                "rgb(108, 117, 125)",
+              ],
+              hoverOffset: 5,
+              spacing: 0,
+              cutout: "60%",
+              // weight: 4,
+            },
+          ],
+        },
+
+        // options: {
+        //   scales: {
+        //     y: {
+        //       beginAtZero: true,
+        //     },
+        //   },
+        // },
+      });
+    </script>
+
+{% endblock %}

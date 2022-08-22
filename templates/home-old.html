@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <section style="height: 60vh;">
+      <div class="container py-2 ">
+        <div class="text-center">
+          <h3>Instructions</h3>
+          <p class="text-justify">
+            This platform is mainly for IP management. It allows efficient IPs
+            utilization and avoids IP confit/duplication. Please kindly be reminded
+            that from now on to use an IP, you should submit an IP request using this
+            <a href="{% url 'apply_new_ip_address' %}">application form</a>
+            . An IP address will be automatically assigned to you via email
+            after IP manager approval. In addition, be informed that any illegal use of an IP address will be
+            simply denied.
+          </p>
+        </div>
+        <div class="text-center mt-5">
+          <a href="{% url 'apply_new_ip_address' %}" class="btn btn-primary mx-2 mb-3">Apply New IP address</a>
+          <a href="{% url 'my_ip_lease_records' %}" class="btn btn-outline-secondary mx-2 mb-3">Check IP lease Record</a>
+        </div>
+        
+      </div>
+    </section>
+
+{% endblock %}

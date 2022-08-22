@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <!-- Ip report email receipient-->
+    <section class="mb-3 mt-4" style="height: 60vh;">
+      <div class="container">
+        <div class="mb-3">
+          <h3>Enter the receipients emails separate with comma</h3>
+        </div>
+        <div class="card mx-auto">
+          <div class="card-body">
+            <form action="{% url 'send_ip_report' report.report_id %}" method="POST" name="Form">
+                {% csrf_token %}
+              <div class="form-floating mb-3">                
+                <input name="send_to" 
+                  type="text"
+                  class="form-control"
+                  id="receipients"
+                  placeholder="Enter receipients emails comma separated"
+                  required
+                />
+                <label for="receipients" class="form-label"
+                  >Enter receipients emails comma separated</label>
+              </div>
+              <div class="my-3 ">
+                <button type="submit" class="btn btn-primary mb-3" id="sendingIpReportBtn">Send Report <i class="bi bi-send-fill"></i></button>
+                <a href="{{ report.report.url  }}" class="btn btn-outline-dark mx-2 mb-3" download> Downlaod Report <i class="bi bi-cloud-arrow-down-fill"></i></a>
+                <a href="{% url 'ip_report_list' %}" class="btn btn-outline-info mx-2 mb-3"> View Report List <i class="bi bi-eye-fill"></i></a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.getElementById("sendingIpReportBtn").addEventListener("click", function (e) {
+        const send_to = document.forms["Form"]["send_to"].value;
+        if (send_to){
+          this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending Report...`;
+          this.classList.add("disabled");        
+        }     
+    
+       });
+    </script>
+
+
+{% endblock %}
+
+

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- IP request detail -->
+    <section>
+      <div class="container">
+        <div class="mb-3 text-center">
+          <h3>Request <span class="text-primary">#{{ new_request.request_id }}</span> details</h3>
+        </div>
+        <div class="card mx-auto" style="max-width: 520px;">          
+          <ul class="list-group list-group-flush">
+
+            <li class="list-group-item">
+              Name: 
+              <span class="fw-bolder">
+                {{ new_request.stuff_user.first_name |lower |capfirst }} {{ new_request.stuff_user.last_name | lower |capfirst }}
+              </span>
+            </li>
+
+            <li class="list-group-item">
+              Email: 
+              <span class="fw-bolder">
+                {{ new_request.stuff_user.email |lower }}
+              </span>
+            </li>
+
+            <li class="list-group-item">
+              Number of IP requested: 
+              <span class="fw-bolder">
+                {{ new_request.number_of_ip }}
+              </span>
+            </li>
+
+            <li class="list-group-item">
+              Request Date: 
+              <span class="fw-bolder">
+                {{ new_request.request_date | date:"M d, Y | H:i" }}
+              </span>
+            </li>
+
+            <li class="list-group-item">
+              Lease End: 
+              <span class="fw-bolder">
+                {{ new_request.lease_end | date:"M d, Y" }} | 00:00
+              </span>
+            </li>
+
+            <li class="list-group-item">
+              Requestor IP: 
+              <span class="fw-bolder">
+                {{ new_request.requestor_ip }}
+              </span>
+            </li>
+            
+
+            {% if new_request.comment %}
+            <li class="list-group-item">Message: <span class="text-muted">{{ new_request.comment }}</span></li>
+            {% else %}
+            <li class="list-group-item">Message: <span class="text-muted">Not Available.</span></li>
+            {% endif %}
+          </ul>
+          
+          {% if is_already_accepted  %}
+          <div class="card-body text-center mb-2 mt-2 d-grid">
+          <button class="btn btn-success" disabled >Already Accepted!</button>        
+          </div>
+          {% elif is_already_rejected %}
+          <div class="card-body text-center mb-2 mt-2 d-grid">
+            <button class="btn btn-danger" disabled>Already Rejected!</button>
+          </div>
+
+          {% else %}
+          <div class="card-body text-center">
+            <div class="row">
+              <div class="col-lg-6 d-grid">
+                <a href="{{ new_request.get_request_detail_url }}?approval=accepted" class="card-link btn btn-success" id="acceptIpRequestDetailBtn">Accept</a>
+              </div>
+              <div class="col-lg-6 d-grid">
+                <a class="card-link btn btn-danger" data-bs-toggle="modal" data-bs-target="#id{{ new_request.request_id }}">
+                  Reject
+                </a>
+    
+                <!-- Modal -->
+                <div class="modal fade" id="id{{ new_request.request_id }}" tabindex="-1" aria-labelledby="id{{ new_request.request_id }}Label" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="id{{ new_request.request_id }}Label">Confirm request #{{ new_request.request_id }} rejection </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <span ><span class="text-danger"><i class="bi bi-exclamation-octagon-fill"></i></span> Are you sure you want to reject request #{{ new_request.request_id }}?</span>
+                      </div>
+                      <div class="modal-footer ">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ new_request.get_request_detail_url }}?approval=rejected" class="btn btn-danger">Confirm Reject</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- modula end -->
+
+              </div>
+            </div>
+
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.getElementById("acceptIpRequestDetailBtn").addEventListener("click", function (e) {
+              this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Accepting...`;
+              this.classList.add("disabled");
+            });
+
+    </script>
+
+{% endblock %}

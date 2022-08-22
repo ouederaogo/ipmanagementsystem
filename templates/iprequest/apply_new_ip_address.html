@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+
+ <section >
+      <div class="container ">        
+        <h3 class="text-center">IP Address Application Form</h3>
+        <article class="card mx-auto mt-3" style="max-width: 620px; margin-top: 40px">
+        <div class="card-body">
+            <div  class="fw-bold text-danger">
+                {{ form.number_of_ip.errors }}
+                {{ form.lease_end.errors }}
+                {{ form.non_field_errors }}
+              </div>
+            <div>
+                <small class="card-title mb-4">
+                    Please fill in your info and submit, no login is required.
+                </small>
+            </div>
+            
+            <form action="{% url 'apply_new_ip_address' %}" method="POST" name="Form">
+            {% csrf_token %}
+            <div>
+                <div class="form-floating mb-3">
+                {{ form.number_of_ip }}
+                <label for="fnameInput">Number Of IP addresses <code>*</code></label>
+                </div>
+
+                <div><small class="text-primary">For efficient IP addresses utilization, the max lease length authorized is 1-month.</small></div>
+                <div class="form-floating mb-3">
+                {{ form.lease_end }}
+                <label for="leaseInput">Lease due date(YYYY-MM-DD)<span class="text-danger">*</span></label>
+                </div>
+
+                <div class="form-floating mb-3">
+                {{ form.comment }}
+                <label for="commentTextarea">Comments</label>
+                </div>
+            </div>
+            <div class="d-grid my-2">
+                <button class="btn btn-primary" type="submit" id="ipApplicationFormSubmitBtn">Submit Application</button>
+            </div>
+            </form>
+        </div>
+        </article>
+      </div>
+    </section>
+    <script>
+      document.getElementById("ipApplicationFormSubmitBtn").addEventListener("click", function (e) {
+        const number_of_ip = document.forms["Form"]["number_of_ip"].value;
+        const lease_end = document.forms["Form"]["lease_end"].value;
+
+        if (number_of_ip && lease_end){
+          this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting Application...`;
+          this.classList.add("disabled");        
+        }     
+    
+       });
+    </script>
+    
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- No Approved reason -->
+    <section class="mb-3 mt-4" style="height: 60vh;">
+      <div class="container">
+        <div>
+          <h3>Enter the request <span style="color:#0d6efd">#{{ new_request.request_id }}</span> rejection reason</h3>
+        </div>
+        <div class="card mx-auto">
+          <div class="card-body">
+            <form action="{% url 'pending_ip_request_detail' new_request.request_id %}?approval=rejected" method="POST" name="Form">
+                {% csrf_token %}
+              <div class="form-floating mb-3">
+                <textarea
+                  class="form-control"
+                  placeholder="Leave cancelation reason"
+                  id="rejectionReason"
+                  style="height: 100px"
+                  name="rejection_reason"
+                  required
+                ></textarea>
+                <label for="rejectionReason">Reason:</label>
+              </div>
+
+              <div class="my-3 ">
+                <button type="submit" class="btn btn-primary" id="rejectRequestEmailBtn"
+                >Send Reason</button>
+                <a href="{% url 'pending_ip_request_detail' new_request.request_id %}" class="btn btn-secondary mx-2"> Cancel and Go Back </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <script>
+      document.getElementById("rejectRequestEmailBtn").addEventListener("click", function (e) {
+        const rejection_reason = document.forms["Form"]["rejection_reason"].value;
+        console.log('rejection_reason is: ..', rejection_reason)
+        if (rejection_reason){
+          this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...`;
+          this.classList.add("disabled");        
+        }     
+    
+       });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+	<section style="min-height:60vh" >
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 d-flex justify-content-end">
+					<img style="width:90% ;" src="{% static 'images/logo1.png' %}" alt="">
+				</div>
+				<div class="col-lg-6 ">
+					<div class="card mx-auto" style="max-width:520px;">
+						<article class="card-body">
+							<header class="mb-4"><h3 class="card-title">Sign up</h3></header>
+							<div class="text-danger mb-3">
+								{{ form.email.errors }}
+								{{ form.non_field_errors }}
+							</div>
+							<form action="{% url 'register' %}" method="POST" name="Form">
+								{% csrf_token %} 
+								
+									<div class="row">
+										<div class="col">
+											<div class="form-floating mb-3">
+												{{ form.first_name }}
+												<label >First name<span class="text-danger">*</span></label>
+											</div>						
+										</div> 
+										<div class="col">						
+											<div class="form-floating mb-3">
+												{{ form.last_name }}
+												<label>Last name<span class="text-danger">*</span></label>
+											</div>
+										</div> 
+									</div> 
+													
+									<div class="row">
+										<div class="col">
+											<div class="form-floating mb-3">
+												{{ form.email }}
+												<label>Email Address<span class="text-danger">*</span></label> 
+											</div>	                       
+										</div> 
+										<div class="col">
+											<div class="form-floating mb-3">
+												{{ form.phone_number }} 
+												<label>Phone Number</label>
+											</div>	  
+															
+										</div> 
+									</div> 
+									
+									<div class="row">
+										<div class="col">
+											<div class="form-floating mb-3">
+												{{ form.password }}
+												<label>Create password<span class="text-danger">*</span></label> 
+											</div>	
+										</div> 
+										<div class="col">
+											<div class="form-floating mb-3">
+												{{ form.confirm_password }}
+											<label>Repeat password<span class="text-danger">*</span></label> 
+											</div>
+										</div>   
+									</div>
+									<div class="mb-3 d-grid">
+										<button type="submit" class="btn btn-primary" id="loginBtn"> Register  </button>
+									</div>
+										
+							</form>
+						</article>
+					</div> 
+					<div>
+						<p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Log In</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		document.getElementById("loginBtn").addEventListener("click", function (e) {
+		const first_name = document.forms["Form"]["first_name"].value;
+		const last_name = document.forms["Form"]["last_name"].value;
+		const email = document.forms["Form"]["email"].value;
+		const password = document.forms["Form"]["password"].value;
+		const confirm_password = document.forms["Form"]["confirm_password"].value;
+		
+		if (first_name && last_name && email && password && confirm_password){
+			this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...`;
+			this.classList.add("disabled");        
+		}     
+
+		});
+	</script>
+
+{% endblock %}

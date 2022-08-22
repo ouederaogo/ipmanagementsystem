@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block content %}
+ 
+
+   <!-- IP report records -->
+    <section>
+      <div class="container mb-5">
+
+        <h3>IP <span class="text-primary">{{ ip_address.ip_address }}</span> Lease History</h3>
+      
+      <div class="card mb-3">
+        <table class="table">
+          <thead class="text-muted">
+            <tr class="small text-uppercase">
+              <th scope="col">REQ. ID</th>
+              <th scope="col">Assigned To</th>
+              <th scope="col">From</th>
+              <th scope="col"> TO</th>
+              <th scope="col"> Status</th>
+              <th scope="col">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {% for ip_lease in ip_address_leases %}
+            <tr>
+              <th scope="row">{{ ip_lease.request_id }}</th>                
+              <td>{{ ip_lease.stuff_user.first_name | lower }}</td>
+              <td>{{ ip_lease.lease_start }}</td>
+              <td>{{ ip_lease.lease_end }}</td>
+              <td>{{ ip_lease.get_request_status }}</td>
+              <td>
+                <!-- Need to make href and ID unique -->
+                <a
+                  data-bs-toggle="offcanvas"
+                  href="#id{{ ip_lease.request_id }}"
+                  role="button"
+                  aria-controls="id{{ ip_lease.request_id }}"
+                  class="btn btn-sm btn-outline-primary"
+                >
+                  view <i class="bi bi-eye-fill"></i>
+                </a>
+
+                <div
+                  class="offcanvas offcanvas-end"
+                  tabindex="-1"
+                  id="id{{ ip_lease.request_id }}"
+                  aria-labelledby="id{{ ip_lease.request_id }}Label"
+                >
+                  <div class="offcanvas-header">
+                    <h5
+                      class="offcanvas-title"
+                      id="id{{ ip_lease.request_id }}Label"
+                    >
+                    {{ ip_lease.stuff_user.first_name | lower }} {{ ip_lease.stuff_user.last_name | lower }}
+                    </h5>
+                    <button
+                      type="button"
+                      class="btn-close text-reset"
+                      data-bs-dismiss="offcanvas"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="offcanvas-body">
+                    <div class="card mb-3">
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-upc-scan"></i></span>
+
+                            Req. ID:
+                            <span class="fw-bolder" style="color: #0d6efd"
+                              >{{ ip_lease.request_id }}</span
+                            >
+                          </small>
+
+
+                          
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-toggles2"></i
+                            ></span>
+
+                            Status:
+                            <!-- When status = Expired, color=#dc3545 -->
+                            <span class="fw-bolder" style="color: #dc3545"
+                              >{{ ip_lease.get_request_status }}</span
+                            >
+                          </small>
+                        </li>
+                        <li class="list-group-item">
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-envelope-fill"></i
+                            ></span>
+
+                            Email:
+                            <span style="color: #5b6987"
+                              >{{ ip_lease.stuff_user.email }}</span
+                            >
+                          </small>
+
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-align-start"></i
+                            ></span>
+
+                            Requested At:
+                            <span style="color: #5b6987">{{ ip_lease.request_date }}</span>
+                          </small>
+                          
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-align-end"></i
+                            ></span>
+
+                            Lease end:
+                            <span style="color: #5b6987">{{ ip_lease.lease_end }}</span>
+                          </small>
+                          
+                          
+                        </li>
+                        <li class="list-group-item">
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-person-fill"></i
+                            ></span>
+
+                            Approved By:
+                            <span style="color: #5b6987">{{ ip_lease.approved_by.first_name }}</span>
+                          </small>
+
+                          <small class="d-block fs-6">
+                            <span style="color: #5b6987"
+                              ><i class="bi bi-clock-fill"></i
+                            ></span>
+
+                            Approved At:
+                            <span style="color: #5b6987">{{ ip_lease.approved_date }}</span>
+                          </small>
+                        </li>
+                       
+                        
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+
+
+          </tbody>
+        </table>
+      </div>
+
+          
+      </div>
+    </section>
+
+{% endblock %}
